@@ -155,8 +155,9 @@ set /a mantissa_mask=8388607
 REM 2^23-1
 IF %int_binary_digits% GEQ 24 (
 set /a "int_temp=%int_temp_string%>>(%int_binary_digits%-24)"
-set /a "int_temp=%int_temp% & %mantissa_mask%"
+set /a "int_temp=!int_temp! & %mantissa_mask%"
 set /a exponent=%int_binary_digits%-1
+
 goto :skipaddingdecimal
 )
 set /a "int_temp=(%int_temp_string%<<(24-%int_binary_digits%))& %mantissa_mask%"
@@ -179,7 +180,7 @@ set /a "exponent=-%first_binary_digit%"
 IF %first_binary_digit% LSS 0 (
 set /a "exponent=-127"
 )
-:skippaddingdecimal
+:skipaddingdecimal
 set /a "exponent=(%exponent%+127)<<23"
 set /a "float_load=%exponent%|%int_temp%|%dec_temp%"
 REM echo %mantissa_mask%

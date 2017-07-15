@@ -1,6 +1,8 @@
 To load a number into var_name:
 call convert load_fp x.y var_name
 
+x and y must both be less than or equal to 2^31
+
 mpy, add, and div are all called as:
 
 call operate operator arg_a_val arg_b_val var_name
