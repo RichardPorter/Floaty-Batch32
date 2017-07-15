@@ -41,7 +41,7 @@ set /a "decimal_multiplier=!decimal_multiplier!>>1"
 set /a "dec_part_decimal=%dec_part_decimal%/2"
 set "dec_string=%dec_part_decimal%"
 call :strLen dec_string unpadded_length
-echo %unpadded_length%
+REM echo %unpadded_length%
 IF %unpadded_length% LSS 9 (
 FOR /L %%A IN (8,-1,%unpadded_length%) DO (
 set "dec_string=0!dec_string!"
@@ -88,15 +88,25 @@ REM echo %int_part%
 REM echo %int_part%
 REM endlocal & set "%4=%int_part%.%dec_string%"
 REM echo %int_part%
-endlocal & set "%4=%int_part%.%dec_string%"
+set sign=
+if %new_sign%==1 (
+set "sign=-"
+)
+endlocal & set "%4=%sign%%int_part%.%dec_string%"
 goto :eof
 
 :load_fp
-echo load
+REM echo load
 for /F "tokens=1,2 delims=." %%A IN ('echo %2') DO (
 set int_temp_string=%%A
 set dec_temp_string=%%B
 
+)
+set /a load_sign=0
+set temp_load_string=%2
+IF "%temp_load_string:~0,1%"=="-" (
+set /a load_sign=1
+set int_temp_string=%int_temp_string:~1%
 )
 REM echo %dec_temp_string%
 REM echo %int_temp_string%
@@ -132,7 +142,7 @@ IF !first_binary_digit! EQU -1 (set /a first_binary_digit=1+%%A)
 )
 )
 :skipdecimal
-echo binary%dec_binary%
+REM echo binary%dec_binary%
 REM echo %decimal_dividor%
 set /a exponent=0
 set /a int_temp=%int_temp_string%+0
@@ -150,13 +160,13 @@ set /a exponent=%int_binary_digits%-1
 goto :skipaddingdecimal
 )
 set /a "int_temp=(%int_temp_string%<<(24-%int_binary_digits%))& %mantissa_mask%"
-echo %int_binary_digits%
+REM echo %int_binary_digits%
 IF %int_binary_digits% GTR 0 (
 set /a "dec_temp=((%dec_binary%)>>(7+%int_binary_digits%))&%mantissa_mask%"
 set /a exponent=%int_binary_digits%-1
 goto :skippaddingdecimal
 )
-echo bd%first_binary_digit%
+REM echo bd%first_binary_digit%
 IF %first_binary_digit% GTR 7 (
 set /a "dec_temp=(%dec_binary%<<(%first_binary_digit%-1-7))&%mantissa_mask%"
 )
@@ -172,8 +182,10 @@ set /a "exponent=-127"
 :skippaddingdecimal
 set /a "exponent=(%exponent%+127)<<23"
 set /a "float_load=%exponent%|%int_temp%|%dec_temp%"
-echo %mantissa_mask%
-echo %float_load%
+REM echo %mantissa_mask%
+REM echo %float_load%
+REM echo %load_sign%
+set /a "float_load=%float_load% ^ (%load_sign%<<31)"
 endlocal & set /a %3=%float_load%
 goto :eof
 
